@@ -1,7 +1,7 @@
 import React from "react";
 import Player from "./Player";
 
-export default function VideoComponent( {video }) {
+export default function VideoContainer( {video }) {
     return (
         <div>
             <Player hash={video.hash} />

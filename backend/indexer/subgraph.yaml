@@ -1,0 +1,24 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: VideoPie
+    network: mumbai
+    source:
+      address: "0xC744214561384CAa34CdDaa33576F4188FaBb72c"
+      abi: VideoPie
+      startBlock: 44793808
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - VideoUploaded
+      abis:
+        - name: VideoPie
+          file: ./abis/VideoPie.json
+      eventHandlers:
+        - event: VideoUploaded(uint256,string,string,string,string,string,string,string,address)
+          handler: handleVideoUploaded
+      file: ./src/video-pie.ts

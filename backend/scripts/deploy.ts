@@ -13,7 +13,7 @@ async function main() {
 
   await videopie.waitForDeployment();
 
-  console.log(`Youtube deployed to ${videopie.target}`);
+  console.log(`VideoPie deployed to ${videopie.target}`);
 }
 
   // We recommend this pattern to be able to use async/await everywhere and properly handle erros

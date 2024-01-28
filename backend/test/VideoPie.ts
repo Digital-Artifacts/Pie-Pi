@@ -4,7 +4,7 @@ import { ethers } from "hardhat";
 
 describe("VideoPie", function () {
   async function setUp() {
-    const [owner, test, user1] = await ethers.getSigners();
+    const [owner, test, author, watcher] = await ethers.getSigners();
 
     const PieToken = await ethers.getContractFactory("Pie");
     const pie = await PieToken.deploy("Pie", "PIE", owner);
@@ -12,7 +12,11 @@ describe("VideoPie", function () {
     const VideoPie = await ethers.getContractFactory("VideoPie");
     const videoPie = await VideoPie.deploy(pie.getAddress());
 
-    return { owner, test, pie, videoPie, user1 };
+    await pie
+      .connect(owner)
+      .transfer(videoPie.getAddress(), await pie.balanceOf(owner.address));
+
+    return { owner, test, pie, videoPie, author, watcher };
   }
 
   describe("Deployment", function () {
@@ -24,12 +28,12 @@ describe("VideoPie", function () {
       expect(await pie.owner()).to.eq(owner);
     });
 
-    it("Balance of owner should be 1,000,000", async function () {
-      const { pie, owner } = await loadFixture(setUp);
+    it("Balance of VideoPie should be 1,000,000", async function () {
+      const { pie, videoPie } = await loadFixture(setUp);
 
       let token_count = ethers.parseEther("1000000");
 
-      expect(await pie.balanceOf(owner)).to.eq(token_count);
+      expect(await pie.balanceOf(videoPie.getAddress())).to.eq(token_count);
     });
 
     it("VideoPie Contract name Should be 'VideoPie' and Should have address of Pie contract", async function () {
@@ -50,8 +54,8 @@ describe("VideoPie", function () {
     it("Should fail to Upload Video", async function () {
       const { videoPie, test } = await loadFixture(setUp);
 
-      expect(
-        await videoPie
+      await expect(
+        videoPie
           .connect(test)
           .uploadVideo(
             "hash",
@@ -64,17 +68,17 @@ describe("VideoPie", function () {
             1,
             test.address
           )
-      ).to.be.revertedWith("Only Owner");
+      ).to.be.revertedWithCustomError(videoPie, "OwnableUnauthorizedAccount");
     });
 
     it("Should Upload Video Successfully", async function () {
-      const { videoPie, owner, user1 } = await loadFixture(setUp);
+      const { videoPie, owner, author } = await loadFixture(setUp);
 
-      expect(
-        await videoPie
+      await expect(
+        videoPie
           .connect(owner)
           .uploadVideo(
-            "hash",
+            "hash111",
             "title",
             "description",
             "location",
@@ -82,18 +86,167 @@ describe("VideoPie", function () {
             "thumbnailHash",
             "date",
             1,
-            user1.address
+            author.address
           )
-      ).to.emit(videoPie, "VideoUploaded");
+      )
+        .to.emit(videoPie, "VideoUploaded")
+        .withArgs(
+          "hash111",
+          "title",
+          "description",
+          "location",
+          "category",
+          "thumbnailHash",
+          "date",
+          author.address
+        );
     });
 
-    it("Video author should be user1", async function () {
-      const { videoPie, user1 } = await loadFixture(setUp);
+    it("Should Fail to Upload Video", async function () {
+      const { videoPie, owner, author } = await loadFixture(setUp);
 
-      const details = await videoPie.videos("hash");
-      console.log(details);
+      // upload a video
+      await videoPie
+        .connect(owner)
+        .uploadVideo(
+          "hash111",
+          "title",
+          "description",
+          "location",
+          "category",
+          "thumbnailHash",
+          "date",
+          1,
+          author.address
+        );
 
-      expect(details).to.eq(user1.address);
+      // try to upload again with the exact same data
+      await expect(
+        videoPie
+          .connect(owner)
+          .uploadVideo(
+            "hash111",
+            "title",
+            "description",
+            "location",
+            "category",
+            "thumbnailHash",
+            "date",
+            1,
+            author.address
+          )
+      ).to.be.revertedWith("Video already exists!");
+    });
+
+    it("Video author should be author", async function () {
+      const { videoPie, owner, author } = await loadFixture(setUp);
+
+      // upload a video
+      await videoPie
+        .connect(owner)
+        .uploadVideo(
+          "hash111",
+          "title",
+          "description",
+          "location",
+          "category",
+          "thumbnailHash",
+          "date",
+          1,
+          author.address
+        );
+
+      // get the result from the mapping
+      const details = await videoPie.videos("hash111");
+
+      expect(details[details.length - 3]).to.eq(author.address);
+    });
+  });
+
+  describe("Watch Time and Reward Claim", async function () {
+    it("Should Lock In Watch Successfully", async function () {
+      const { videoPie, owner, author, watcher } = await loadFixture(setUp);
+
+      // upload a video
+      await videoPie
+        .connect(owner)
+        .uploadVideo(
+          "hash111",
+          "title",
+          "description",
+          "location",
+          "category",
+          "thumbnailHash",
+          "date",
+          1,
+          author.address
+        );
+
+      // lock in a watch time
+      let allocation = (1n * 10n ** 18n) / 60n;
+      await expect(
+        videoPie.connect(owner).lockInWatchTime("hash111", 1, watcher.address)
+      )
+        .to.emit(videoPie, "VideoWatched")
+        .withArgs("hash111", watcher.address, allocation);
+    });
+
+    it("Should Not Allow Lock In Of Watch Time", async function () {
+      const { videoPie, owner, author, watcher } = await loadFixture(setUp);
+
+      // upload a video
+      await videoPie
+        .connect(owner)
+        .uploadVideo(
+          "hash111",
+          "title",
+          "description",
+          "location",
+          "category",
+          "thumbnailHash",
+          "date",
+          1,
+          author.address
+        );
+
+      // lock in invalid watch time
+      await expect(
+        videoPie.connect(owner).lockInWatchTime("hash111", 5, watcher.address)
+      ).to.be.revertedWith("Invalid watch time");
+    });
+
+    it("Should Allow Claim Of Rewards", async function () {
+      const { videoPie, pie, owner, author, watcher } = await loadFixture(
+        setUp
+      );
+
+      // upload a video
+      await videoPie
+        .connect(owner)
+        .uploadVideo(
+          "hash111",
+          "title",
+          "description",
+          "location",
+          "category",
+          "thumbnailHash",
+          "date",
+          1,
+          author.address
+        );
+
+      // lock in watch time
+      await videoPie
+        .connect(owner)
+        .lockInWatchTime("hash111", 1, watcher.address);
+
+      console.log(await pie.allowance(owner, videoPie.getAddress()));
+
+      // claim reward
+      await videoPie.connect(watcher).claimRewards("hash111", 1);
+
+      let allocation = (1n * 10n ** 18n) / 60n;
+      expect(await pie.balanceOf(watcher.address)).to.eq(allocation);
     });
   });
 });

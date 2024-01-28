@@ -4,6 +4,8 @@ pragma solidity ^0.8.9;
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+// import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
 interface IERC20 {
     function transferFrom(
         address from,
@@ -12,6 +14,10 @@ interface IERC20 {
     ) external returns (bool);
 
     function transfer(address to, uint256 amount) external returns (bool);
+
+    function approve(address spender, uint256 value) external returns (bool);
+
+    function totalSupply() external view returns (uint256);
 }
 
 contract VideoPie is Ownable {
@@ -19,6 +25,7 @@ contract VideoPie is Ownable {
     string public name = "VideoPie";
 
     // Pie token
+    // using SafeERC20 for IERC20;
     IERC20 public immutable pie;
 
     // Creating a mapping of videoCount to videoCount
@@ -67,6 +74,7 @@ contract VideoPie is Ownable {
 
     constructor(address _pieToken) Ownable(msg.sender) {
         pie = IERC20(_pieToken);
+        // pie.approve(address(this), pie.totalSupply());
     }
 
     // Function to upload a video
@@ -80,19 +88,18 @@ contract VideoPie is Ownable {
         string memory _date,
         uint256 _twt,
         address _author
-    ) public {
+    ) public onlyOwner {
         // Validating the video hash, title and author's address
-        require(bytes(_videoHash).length > 0);
-        require(bytes(_title).length > 0);
-        require(msg.sender != address(0));
+        require(bytes(_videoHash).length > 0, "Invalid Byte Length!");
+        require(bytes(_title).length > 0, "Invalid Title!");
         require(
-            keccak256(abi.encodePacked(videos[_videoHash].hash)) !=
-                keccak256(abi.encodePacked(_videoHash)),
+            keccak256(abi.encode(videos[_videoHash].hash)) !=
+                keccak256(abi.encode(_videoHash)),
             "Video already exists!"
         );
 
         // Adding the video to the contract
-        videos[_videoHash] = Video({
+        Video memory _video = Video({
             twt: _twt,
             hash: _videoHash,
             title: _title,
@@ -105,6 +112,8 @@ contract VideoPie is Ownable {
             author_allocation: 0
         });
 
+        videos[_videoHash] = _video;
+
         // Triggering the event
         emit VideoUploaded(
             _videoHash,
@@ -114,7 +123,7 @@ contract VideoPie is Ownable {
             _category,
             _thumbnailHash,
             _date,
-            msg.sender
+            _author
         );
     }
 
@@ -123,14 +132,14 @@ contract VideoPie is Ownable {
         string memory _videoHash,
         uint256 _watchTime,
         address _userAddress
-    ) public {
+    ) public onlyOwner {
         // Make sure the video exists
         require(bytes(_videoHash).length > 0);
         require(msg.sender != address(0));
         require(
             keccak256(abi.encode(videos[_videoHash].hash)) ==
                 keccak256(abi.encode(_videoHash)),
-            "Video doesnt Exist"
+            "Video doesn't Exist!"
         );
         require(videos[_videoHash].twt == _watchTime, "Invalid watch time");
 
@@ -146,29 +155,23 @@ contract VideoPie is Ownable {
         emit VideoWatched(_videoHash, _userAddress, token_allocation);
     }
 
-    function claimRewards(
-        string memory _videoHash,
-        uint256 _watchTime,
-        address _userAddress
-    ) public {
+    function claimRewards(string memory _videoHash, uint256 _watchTime) public {
         require(
             videos[_videoHash].twt == _watchTime,
             "WatchTime and VideoLength Mismatch!"
         );
         require(
-            user_token_allocation[_videoHash][_userAddress] != 0,
+            user_token_allocation[_videoHash][msg.sender] != 0,
             "No Tokens To Claim"
         );
 
-        uint256 user_allocation = user_token_allocation[_videoHash][
-            _userAddress
-        ];
-        user_token_allocation[_videoHash][_userAddress] = 0;
+        uint256 user_allocation = user_token_allocation[_videoHash][msg.sender];
+        user_token_allocation[_videoHash][msg.sender] = 0;
 
-        bool success = pie.transfer(_userAddress, user_allocation);
-        require(success, "Rewarding User Failed");
+        bool success = pie.transfer(msg.sender, user_allocation);
+        require(success, "Failed to transfer tokens");
 
-        emit RewardUser(_videoHash, _userAddress, user_allocation);
+        emit RewardUser(_videoHash, msg.sender, user_allocation);
     }
 
     // function to calculate tokena allocation
@@ -177,8 +180,8 @@ contract VideoPie is Ownable {
         pure
         returns (uint256)
     {
-        (bool success, uint256 res) = Math.tryDiv(_twt, 60);
-        require(success, "Invalid Tota Watch Time");
+        (bool success, uint256 res) = Math.tryDiv((_twt * 10**18), 60);
+        require(success, "Invalid Total Watch Time");
 
         return res;
     }

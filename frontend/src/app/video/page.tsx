@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import client  from "@/clients/apollo";
 import { ApolloProvider } from "@apollo/client";
 import { LivepeerConfig } from "@livepeer/react";
 import LivepeerClient from "@/clients/livepeer";
-import VideoPlayer from "./VideoPlayer";
+import VideoPlayer from "./videoplayer";
 
 export type Video = {
     id: string | undefined;

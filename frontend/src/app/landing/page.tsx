@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 
-const Landing = () => {
+const LandingPage = () => {
 
     const [isConnected, setIsConnected] = useState(false);
     
@@ -62,11 +62,20 @@ const Landing = () => {
             
             <h1 className="text-5xl text-white md:text-6xl font-extrabold leading-tighter tracking-tighter mb-4" 
                 data-aos="zoom-y-0ut"
-            >   
-            It's Youtube, but {" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
-            Decentralized</span>
+            >
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-teal-400">Pie - {" "}</span>   
+            
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-teal-400">
+            Pi</span>
             </h1>
+            
+            <h2 className="text-5xl text-white md:text-6xl font-extrabold leading-tighter tracking-tighter mb-4" 
+                data-aos="zoom-y-0ut"
+            >   
+            
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-red-400">
+            A video sharing network, for Areon</span>
+            </h2>
         <div className='max-w-3xl mx-auto'>
 
             <p
@@ -74,7 +83,7 @@ const Landing = () => {
                 data-aos="zoom-y-out"
                 data-aos-delay="150"
             >
-            A Youtube CLone built on top of Polygon network, allows users to create, share and watch videos, without worrying about their privacy.
+            Create! Share! and Watch Videos! on the blockchain!! 
             </p>
 
             <button 
@@ -99,4 +108,4 @@ const Landing = () => {
   )
 }
 
-export default Landing
+export default LandingPage

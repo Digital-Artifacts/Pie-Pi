@@ -1,11 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useAsset } from "@livepeer/react";
 import Plyr, { PlyrInstance } from "plyr-react";
 import "plyr-react/plyr.css";
 
-export default function Player({ id }) {
+
+interface PlayerProps {
+    id: any;
+  }
+  
+  const Player: React.FC<PlayerProps> = ({ id }) => {
+
+    const { data: asset, error, status } = useAsset(id);
+
+    if (status === 'loading') {
+      return <p>Loading!</p>;
+    }
+
+    if (error || !asset) {
+      console.error("Error fetching asset data: error");
+      return <p>Error loading video.</p>
+    }
     
-    const { data: asset } = useAsset(id);
+ 
 
     return (
         <Plyr
@@ -21,9 +37,11 @@ export default function Player({ id }) {
                 ],
             }}
             options={{
-                autoplay: true,
+                autoPlay: true,
             }}
-                autoplay={true}
+                autoPlay={true}
             />
     );
 }
+
+export default Player;

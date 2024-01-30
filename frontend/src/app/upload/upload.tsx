@@ -1,27 +1,35 @@
 'use client'
 
 import React, { useState, useRef } from "react";
-import { BiCloud, BiMusic, BiPlus } from "react-icons/bi";
-import { create } from "ipfs-http-client";
+import { BiCloud, BiPlus } from "react-icons/bi";
 import saveToIPFS from "../../utils/saveToIPFS";
 import { useCreateAsset } from "@livepeer/react";
 import getContract from "../../utils/getContract";
-import LivepeerClient from "@/clients/livepeer";
 import { LivepeerConfig } from "@livepeer/react";
+import LivepeerClient from "@/clients/livepeer";
 
-
+type Asset = {
+  name: string;
+  file: File;
+};
 
 export type UploadData = {
-  video: string | undefined;
+  video: string | null;
   title: string;
   description: string;
   location: string;
   category: string;
-  thumbnail: string;
+  thumbnail: string | null;
   UploadedDate: number;
+  duration: number | null;
+  livepeerID: string | null
 };
 
-
+interface UploadVideoParams {
+  videoCID: string | null;
+  duration: number | null;
+  livepeerID: string | null;
+}
 
 export default function Upload() {
   // Creating state for the input field
@@ -39,13 +47,16 @@ export default function Upload() {
     category: '',
     thumbnail: '',
     UploadedDate: 0,
+    duration: 0,
+    livepeerID: ''
   });
+
   
 
   //  Creating a ref for thumbnail and video
   const thumbnailRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLInputElement>(null);
-  
+
   const {
     mutate: createAsset,
     data: assets,
@@ -73,69 +84,103 @@ export default function Upload() {
         }
       : null,
   );
+  
 
   const goBack = () => {
     window.history.back()
   }
 
 
-
   // When a user clicks on the upload button
   const handleSubmit = async () => {
 
     // Calling the upload video function
-    await uploadVideo();
+    const videoParams = await uploadVideo();
+    const videoCID = videoParams?.videoCID ?? '';
+    const duration = videoParams?.duration ?? null;
+    const livepeerID = videoParams?.livepeerID ?? '';
+
+    console.log(duration, livepeerID, videoCID);
 
     // Calling the upload thumbnail function and getting the CID
     const thumbnailCID = await uploadThumbnail();
-
-   
-    // Creating a object to store the metadata
+    if (thumbnailCID) {
+      
+      // Creating a object to store the metadata
       let data = {
-        video: assets?.[0].id,
+        video: videoCID,
         title,
         description,
         location,
         category,
         thumbnail: thumbnailCID,
-        UploadedDate: Date.now(),
+        UploadedDate: Date.now(), // dateNow not working!
+        duration: duration,
+        livepeerID: livepeerID
       };
+      
       // Calling the saveVideo function and passing the metadata object
       console.log(data)
-      await saveVideo(data);
-
-      
-
-    
+      await saveVideo(data);     
+    } else {
+    } 
   };
 
   // Function to upload the video to IPFS
-  const uploadThumbnail = async () => {
-    
+  async function uploadThumbnail(): Promise<string | null> {
     if (thumbnail) {
-      // Passing the file to the saveToIPFS function and getting the CID
-    const cid = await saveToIPFS(thumbnail);
-
-    // Returning the CID
-    return cid;
+      try {
+        // Passing the file to the saveToIPFS function and getting the CID
+        const cid = await saveToIPFS(thumbnail);
+        return cid;
+      } catch (error) {
+        console.error("Error saving thumbnail to IPFS:", error);
+        return null;
+      }
     } else {
       return null;
     }
-    
+   
   };
 
+  
   // Function to upload the video to Livepeer
-  const uploadVideo = async () => {
+async function uploadVideo(): Promise<UploadVideoParams | null> {
+  
+  await createAsset?.()
+
+  // Wait for the status to be "success" or timeout after a certain duration
+  const timeoutDuration = 5000; // 5 seconds timeout (adjust as needed)
+  const startTime = Date.now();
+
+  while (status !== "success" && Date.now() - startTime < timeoutDuration) {
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Wait for 100 milliseconds before checking again
+  }
+
+   // Log the status and assets for debugging
+   console.log("Status:", status);
+   console.log("Assets:", assets);
+
+  // Check the status of the asset creation
+  if (status === "success"  && assets && assets.length > 0) {
+    const asset = assets?.[0]
+    console.log(asset)
+
+    // Access the CID and other parameters
+    const videoParams : UploadVideoParams = {
+      videoCID: asset?.storage?.ipfs?.cid || null,
+      duration: asset?.videoSpec?.duration || null,
+      livepeerID: asset?.id || null
+    }
+    return videoParams
     
-    // Calling the createAsset function from the useCreateAsset hook to upload the video
-    createAsset?
-    ({
-      name: title,
-      file: video
-    }) : null
-
-  };
-
+    
+  } else {
+    // Handle the case where asset creation was not successful
+    console.error("Error creating the asset")
+    return null;
+  }
+}
 
   // Function to save the video to the Contract
   const saveVideo = async (data: UploadData = uploadData) => {
@@ -150,15 +195,45 @@ export default function Upload() {
       data.location,
       data.category,
       data.thumbnail,
-      false,
-      data.UploadedDate
+      data.UploadedDate,
+      data.duration,
+      data.livepeerID
     );
+
+    // Log a message indicating that the video was uploaded
+    console.log("Video uploaded to the contract:", data.title);
   };
+
+
+  // fetch("https://api.thegraph.com/subgraphs/name/adedamolaxl/youtube-clone", {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   body: JSON.stringify({
+  //     query: `
+  //       {
+  //         videos {
+  //           id
+  //           title
+  //           description
+  //           category
+  //           // Add other necessary fields
+  //         }
+  //       }
+  //     `,
+  //   }),
+  // })
+  //   .then(response => response.json())
+  //   .then(data => console.log("GraphQL Query Result:", data))
+  //   .catch(error => console.error("Error fetching videos:", error));
 
 
   return (
 
-    <LivepeerConfig client={LivepeerClient}> 
+    <LivepeerConfig client={LivepeerClient}>
+
+    
 
     <div className="w-full h-screen bg-[#1a1c1f] flex flex-row">
       <div className="flex-1 flex flex-col">
@@ -306,7 +381,6 @@ export default function Upload() {
         />
       </div>
     </div>
-
     </LivepeerConfig>
     
   );

@@ -1,10 +1,12 @@
 'use client'
 
-import React, { useState, useRef } from "react";
-import { BiCloud, BiPlus } from "react-icons/bi";
+import React, { useState, useRef, useEffect } from "react";
+import { BiCloud, BiMusic, BiPlus } from "react-icons/bi";
+import { create } from "ipfs-http-client";
 import saveToIPFS from "../../utils/saveToIPFS";
 import { useCreateAsset } from "@livepeer/react";
 import getContract from "../../utils/getContract";
+import { getUserAddress } from "@/utils/getUseAddress";
 import { LivepeerConfig } from "@livepeer/react";
 import LivepeerClient from "@/clients/livepeer";
 
@@ -21,7 +23,7 @@ export type UploadData = {
   category: string;
   thumbnail: string | null;
   UploadedDate: number;
-  duration: number | null;
+  twt: number | null;
   livepeerID: string | null
 };
 
@@ -31,7 +33,7 @@ interface UploadVideoParams {
   livepeerID: string | null;
 }
 
-export default function Upload() {
+export default function UploadPage() {
   // Creating state for the input field
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -47,7 +49,7 @@ export default function Upload() {
     category: '',
     thumbnail: '',
     UploadedDate: 0,
-    duration: 0,
+    twt: 0,
     livepeerID: ''
   });
 
@@ -94,11 +96,29 @@ export default function Upload() {
   // When a user clicks on the upload button
   const handleSubmit = async () => {
 
+    const userAddress = await getUserAddress();
+
+    console.log("User address:", userAddress);
+
     // Calling the upload video function
     const videoParams = await uploadVideo();
     const videoCID = videoParams?.videoCID ?? '';
-    const duration = videoParams?.duration ?? null;
     const livepeerID = videoParams?.livepeerID ?? '';
+    let duration = videoParams?.duration ?? null;
+    
+    let twt: number | null = null;
+    
+    if (duration !== null) {
+
+      let wholeDuration: number = Math.ceil(duration);
+
+      twt = wholeDuration
+
+      console.log(twt)
+    } else {
+      console.error("Duration is null")
+    }
+    
 
     console.log(duration, livepeerID, videoCID);
 
@@ -114,14 +134,14 @@ export default function Upload() {
         location,
         category,
         thumbnail: thumbnailCID,
-        UploadedDate: Date.now(), // dateNow not working!
-        duration: duration,
+        UploadedDate: Date.now(), // dateNow not working
+        twt: twt,
         livepeerID: livepeerID
       };
       
       // Calling the saveVideo function and passing the metadata object
       console.log(data)
-      await saveVideo(data);     
+      await saveVideo(data, userAddress);     
     } else {
     } 
   };
@@ -183,7 +203,7 @@ async function uploadVideo(): Promise<UploadVideoParams | null> {
 }
 
   // Function to save the video to the Contract
-  const saveVideo = async (data: UploadData = uploadData) => {
+  const saveVideo = async (data: UploadData = uploadData, userAddress: string) => {
     // Get the contract from the getContract function
     let contract = await getContract();
 
@@ -196,37 +216,14 @@ async function uploadVideo(): Promise<UploadVideoParams | null> {
       data.category,
       data.thumbnail,
       data.UploadedDate,
-      data.duration,
-      data.livepeerID
+      data.twt,
+      data.livepeerID,
+      userAddress
     );
 
     // Log a message indicating that the video was uploaded
     console.log("Video uploaded to the contract:", data.title);
   };
-
-
-  // fetch("https://api.thegraph.com/subgraphs/name/adedamolaxl/youtube-clone", {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  //   body: JSON.stringify({
-  //     query: `
-  //       {
-  //         videos {
-  //           id
-  //           title
-  //           description
-  //           category
-  //           // Add other necessary fields
-  //         }
-  //       }
-  //     `,
-  //   }),
-  // })
-  //   .then(response => response.json())
-  //   .then(data => console.log("GraphQL Query Result:", data))
-  //   .catch(error => console.error("Error fetching videos:", error));
 
 
   return (

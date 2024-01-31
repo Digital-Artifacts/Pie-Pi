@@ -2,7 +2,7 @@
 
 import { createReactClient, studioProvider } from "@livepeer/react";
 
-const LIVEPEER_KEY = 'process.env.NEXT_PUBLIC_LIVEPEER_KEY';
+const LIVEPEER_KEY = process.env.NEXT_PUBLIC_LIVEPEER_KEY || "";
 
 
 const LivepeerClient = createReactClient({

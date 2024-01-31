@@ -4,6 +4,7 @@ import { ethers } from "hardhat";
 
 describe("VideoPie", function () {
   async function setUp() {
+
     const [owner, test, author, watcher] = await ethers.getSigners();
 
     const PieToken = await ethers.getContractFactory("Pie");
@@ -65,6 +66,7 @@ describe("VideoPie", function () {
             "category",
             "thumbnailHash",
             "date",
+            "livepeerID",
             1,
             test.address
           )

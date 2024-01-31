@@ -8,7 +8,7 @@ export interface IVideo {
     thumbnailHash: string;
     isAudio: boolean;
     date: string;
-    duration: string
+    duration: Number
     livepeerID: string;
     author: string;
     createdAt: BigInt;

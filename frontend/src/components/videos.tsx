@@ -15,7 +15,7 @@ const Videos: React.FC<IProps> = ({ horizontal, video }) => {
   const params = useParams <{slug:string}>
 
  return (
-  <Link href={`/video/${video.id}`}>
+  <Link href={`/video/${video.hash}`}>
       <div
         className={`${
           horizontal
@@ -36,11 +36,11 @@ const Videos: React.FC<IProps> = ({ horizontal, video }) => {
           <h4 className="text-md font-bold dark:text-white mt-3 text-black text-transform: capitalize">
             {video.title}
           </h4>
-          {horizontal && (
+          {/* {horizontal && (
             <p className="text-sm flex items-center text-subtitle-light mt-1">
               {video.category} • March 7, 2022
             </p>
-          )}
+          )} */}
           <p className="text-sm flex items-center text-subtitle-light mt-1">
             {horizontal ? null : video.category + " • "}
             {video?.author?.slice(0, 9)}...{" "}

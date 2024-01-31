@@ -10,12 +10,15 @@ import { BiCheck } from "react-icons/bi";
 import Avvvatars from 'avvvatars-react'
 import { IVideo } from "@/types";
 import { gql } from "@apollo/client";
-import Player from "../../../components/player";
+import Player from "@/components/player";
 
 import { ApolloProvider } from "@apollo/client";
 import { LivepeerConfig } from "@livepeer/react";
 import LivepeerClient from "@/clients/livepeer";
-
+import { abi } from "../../../constants/videoPie";
+import { Contract_Address } from "../../../constants/videoPie";
+import { ethers } from "ethers";
+import getContract from "@/utils/getContract";
 
 
 export type Video = {
@@ -31,67 +34,87 @@ export default function Video() {
   const [relatedVideos, setRelatedVideos] = useState<IVideo[]>([])
 
   const params = useParams();
-  const videoId = params.videoId;
+  const videoid = params.videoid;
 
-  console.log(videoId)
-  
+  console.log(videoid)
   console.log(params)
 
-  const GET_VIDEO_UPLOADS = gql`
-    query {
-      videoUploadeds {
-      id
-      Youtube_id
-      hash
-      title
-      thumbnailHash
-      category
-      author
-      livepeerID
-      }
-    }
-  `;
+  // Ethereum provider and contract address (replace these with your actual values)
+  const provider = new ethers.JsonRpcProvider("https://testnet-rpc.areon.network"); 
+  const contract = new ethers.Contract(Contract_Address, abi, provider);
 
-  // Function to get the videos from the graph
+
+
   const getVideos = async () => {
     try {
-      const { data } = await ApolloClient.query({
-        query: GET_VIDEO_UPLOADS,
-        fetchPolicy: "network-only",
-      });
-  
-    setRelatedVideos(data.videoUploadeds.filter((v: Video) => v.id !== videoId))
-    const video = data?.videoUploadeds?.find((video: Video) => (video.id)=== (videoId))
+      
 
-    console.log(video)
+      // Call the appropriate function on your smart contract to retrieve videos
+      const allVideos = await contract.getVideos();
 
-    if (!video) {
-      console.log(`Video with ID ${videoId} not found.`);
-    } else {
-      console.log('Found video:', video);
+      // Call the function to get video properties
+      const [videoId, videoHash, videoTitle, videoLivepeerID] = await contract.getVideosWithProperties();
+
+      // Combine video information and properties
+      const videosData = allVideos.map((video: any, index: any) => ({
+        id: Number(video.id),
+        hash: video.hash,
+        title: video.title,
+        description: video.description,
+        thumbnailHash: video.thumbnailHash,
+        duration: Number(video.twt),
+        livepeerID: video.livepeerID,
+        author: video.author    
+        // Add other properties as needed from videoIds, videoHash, etc.
+      }));
+
+      
+
+      setRelatedVideos(videosData.filter((video:any) => video.hash !== (videoid)));
+      const video = videosData.find((video:any) => video.hash === (videoid));
+
+      console.log(video)
+      
+      if (!video) {
+        console.log(`Video with ID ${videoid} not found.`);
+      } else {
+        console.log('Found video:', video);
+      }
+
+      setVideo(video);
+
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+     
     }
-
-    setVideo(video)
-    console.log('videos', data.videoUploadeds)
-    
- 
-  } catch(err) {
-    console.error("err", err);
-  }
-  
   };
 
   useEffect(() => {
-    getVideos()
-  }, [videoId])
+    // Runs the function getVideos when the component is mounted
+    getVideos();
+  }, [videoid]);
 
+  if (!video) {
+    return <p>Loading...</p>;
+  }
 
+  const handleClaimReward = async () => {
+    try {
+      // Call the function to claim rewards on the smart contract
+      let claim = await getContract();
 
-    // Conditional rendering
-    if (!video) {
-      // You can render a loading state or return null
-      return <p>Loading...</p>;
+      await claim.claimRewards(video.id, video.duration);
+
+      console.log("Reward claimed successfully:", video.duration);
+
+      // You may want to update the UI or show a success message to the user
+    } catch (error) {
+      console.error("Error claiming rewards:", error);
+
+      // You may want to handle the error and show an error message to the user
     }
+  };
+
 
   return (
     
@@ -112,6 +135,8 @@ export default function Video() {
                   {video.category} ~ {' '}
                   {moment(new Date(Number(video.createdAt) * 1000)).fromNow()}
                 </p> */}
+                 {/* Render the button if the duration is greater than the threshold */}
+                 <button onClick={handleClaimReward}>Claim Reward</button>
               </div>
               </div>
 

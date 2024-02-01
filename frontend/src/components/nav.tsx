@@ -32,7 +32,7 @@ export default function Component() {
   )
 }
 
-function SearchIcon(props) {
+function SearchIcon(props:any) {
   return (
     <svg
       {...props}
@@ -53,7 +53,7 @@ function SearchIcon(props) {
 }
 
 
-function UploadIcon(props) {
+function UploadIcon(props:any) {
   return (
     <svg
       {...props}
@@ -75,7 +75,7 @@ function UploadIcon(props) {
 }
 
 
-function VideoIcon(props) {
+function VideoIcon(props:any) {
   return (
     <svg
       {...props}

@@ -6,9 +6,9 @@ import Link from "next/link";
 
 import { useParams } from "next/navigation";
 
-interface IProps {
+export type IProps = {
   video: IVideo
-  horizontal?: Boolean;
+  horizontal?: boolean;
 }
 
 const Videos: React.FC<IProps> = ({ horizontal, video }) => {
@@ -32,7 +32,7 @@ const Videos: React.FC<IProps> = ({ horizontal, video }) => {
           src={getImage(video.thumbnailHash)}
           alt=""
         />
-        <div className={horizontal && "ml-3  w-80"}>
+        <div className={horizontal ? "ml-3  w-80" : undefined}>
           <h4 className="text-md font-bold dark:text-white mt-3 text-black text-transform: capitalize">
             {video.title}
           </h4>

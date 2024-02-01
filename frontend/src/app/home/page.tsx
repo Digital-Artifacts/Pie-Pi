@@ -2,18 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import  Videos  from "../../components/videos";
+import  Videos, { IProps }  from "../../components/videos";
 import Background from "../../components/background"
 import { abi } from "../../constants/videoPie";
 import { Contract_Address } from "../../constants/videoPie";
 
 
+//  type IProps = {
+//    horizontal?: boolean;
+//  }
 
-interface IProps {
-  horizontal?: Boolean;
-}
-
-const HomePage: React.FC<IProps> = () => {
+const HomePage: React.FC = () => {
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState<boolean>(true);
   
@@ -87,7 +86,7 @@ const HomePage: React.FC<IProps> = () => {
                 </>
               ) : (
                 videos?.map((video:any) => (
-                  <Videos video={video} horizontal={false} />
+                  <Videos video={video} key= {video.hash} horizontal={false} />
                 ))
               )}
            </div>       

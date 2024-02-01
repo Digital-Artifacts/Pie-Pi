@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import ApolloClient from "@/clients/apollo";
-import { ApolloProvider } from "@apollo/client";
 import  Videos  from "../../components/videos";
 import Background from "../../components/background"
 import { abi } from "../../constants/videoPie";
@@ -67,8 +65,7 @@ const HomePage: React.FC<IProps> = () => {
 
   
   return (
-      
-    <ApolloProvider client={ApolloClient}> 
+       
       <Background className="w-full">   
         <div className="w-full bg-[#1a1c1f] flex flex-row">
            
@@ -97,7 +94,7 @@ const HomePage: React.FC<IProps> = () => {
         </div>
         </div>
       </Background>   
-    </ApolloProvider>
+   
 
   );
 }

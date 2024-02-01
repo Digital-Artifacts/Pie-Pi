@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import Link from 'next/link';
 
 const LandingPage = () => {
 
@@ -74,7 +75,7 @@ const LandingPage = () => {
             >   
             
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-red-400">
-            A video sharing network, for Areon</span>
+            A video sharing network coming to Areon..</span>
             </h2>
         <div className='max-w-3xl mx-auto'>
 
@@ -86,16 +87,41 @@ const LandingPage = () => {
             Create! Share! and Watch Videos! on the blockchain!! 
             </p>
 
-            <button 
+            {/* <button
+                  className="items-center  bg-white rounded-full font-medium  p-4 shadow-lg"
+                  onClick={() => {
+                    // Calling the connectWallet function when user clicks on the button
+                    connectWallet();
+                  }}
+                >
+                  <span className='text-black'>Connect Wallet</span>
+                </button> */}
+
+            
+            
+            <button className='items-center  bg-white rounded-full font-medium hover:bg-red-500 p-4 shadow-lg mr-6'>
+                <Link className="text-base font-medium hover:underline text-black text-" href="./home">
+                    Watch Videos
+                </Link>
+            </button>
+
+            <button className='items-center  bg-white rounded-full hover:bg-sky-500 font-medium  p-4 shadow-lg ml-6'>
+                <Link className="text-base font-medium hover:underline text-black" href="./upload">
+                    Upload Videos
+                </Link>
+            </button>
+            
+
+            {/* <button 
                 className={`items-center bg-white rounded-full font-medium p-4 shadow-lg
                     ${ isConnected ? "bg-gray-500 text-white" : ""}`}               
                 onClick={() => {
                     // Calling the connectWallet function when the button is clicked
                     connectWallet();
                 } }
-            >
-            <span>{ isConnected ? "Wallet Connected" : "Connect wallet" }</span>
-            </button>
+            >Connect WAllet
+            <span className='text-white' { isConnected ? "Wallet Connected" : "Connect wallet" }</span>
+            </button> */}
         </div>
         </div>
         </div>

@@ -7,7 +7,7 @@ export default function Component() {
     <header className="dark flex h-20 w-full shrink-0 items-center px-4 md:px-6 bg-transparent text-gray-200">
       <Link className="mr-6" href="#">
         <VideoIcon className="h-6 w-6" />
-        <span className="sr-only">Decentralized YouTube</span>
+        <span className="sr-only">Pie-Pi</span>
       </Link>
       <div className="flex w-full justify-center">
         <form className="relative w-full max-w-[600px]">
@@ -16,14 +16,14 @@ export default function Component() {
         </form>
       </div>
       <nav className="ml-auto flex gap-4 sm:gap-6">
-        <Link className="text-sm font-medium hover:underline" href="#">
+        <Link className="text-sm font-medium hover:underline" href="./home">
           Home
         </Link>
-        <Link className="text-sm font-medium hover:underline" href="#">
-          Profile
-        </Link>
-        <Link className="text-sm font-medium hover:underline" href="#">
+        <Link className="text-sm font-medium hover:underline" href="./upload">
           Upload
+        </Link>
+        <Link className="text-sm font-medium hover:underline" href="./profile">
+          Profile
         </Link>
        
         

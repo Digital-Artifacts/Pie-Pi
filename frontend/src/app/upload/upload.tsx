@@ -98,7 +98,7 @@ export default function UploadPage() {
 
     const userAddress = await getUserAddress();
 
-    console.log("User address:", userAddress);
+    // console.log("User address:", userAddress);
 
     // Calling the upload video function
     const videoParams = await uploadVideo();
@@ -114,13 +114,13 @@ export default function UploadPage() {
 
       twt = wholeDuration
 
-      console.log(twt)
+      // console.log(twt)
     } else {
-      console.error("Duration is null")
+      // console.error("Duration is null")
     }
     
 
-    console.log(duration, livepeerID, videoCID);
+    // console.log(duration, livepeerID, videoCID);
 
     // Calling the upload thumbnail function and getting the CID
     const thumbnailCID = await uploadThumbnail();
@@ -179,7 +179,7 @@ async function uploadVideo(): Promise<UploadVideoParams | null> {
 
    // Log the status and assets for debugging
    console.log("Status:", status);
-   console.log("Assets:", assets);
+  //  console.log("Assets:", assets);
 
   // Check the status of the asset creation
   if (status === "success"  && assets && assets.length > 0) {
@@ -222,7 +222,7 @@ async function uploadVideo(): Promise<UploadVideoParams | null> {
     );
 
     // Log a message indicating that the video was uploaded
-    console.log("Video uploaded to the contract:", data.title);
+    console.log("Your video:", data.title,",", "has been uploaded to the contract!");
   };
 
 

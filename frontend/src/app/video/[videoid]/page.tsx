@@ -135,10 +135,16 @@ export default function Video() {
                   {video.category} ~ {' '}
                   {moment(new Date(Number(video.createdAt) * 1000)).fromNow()}
                 </p> */}
-                 {/* Render the button if the duration is greater than the threshold */}
-                 <button onClick={handleClaimReward}>Claim Reward</button>
+                <p className="mt-1 text-gray-500">
+                {"Duration:" + video.duration + "s " + " • "}
+                </p> 
+                 
               </div>
               </div>
+
+              <p className="text-text-light dark:text-text-dark-text-textSubtTitle mt-4 ml-16 text-sm">
+                  {video.description}
+                </p>
 
               <div>
                 <div className="mt-5 flex flex-row items-center">
@@ -157,13 +163,11 @@ export default function Video() {
                   </div>
                 </div>
                 
-                <p className="text-text-light dark:text-text-dark-text-textSubtTitle mt-4 ml-16 text-sm">
-                  {video.description}
-                </p>
+               
               </div>
               </div>
               
-              <div className="w-2/6">
+              {/* <div className="w-2/6">
                 <h4 className="text-md ml-5 mb-3 font-bold text-black dark:text-white">
                   Related Videos
                 </h4>
@@ -172,7 +176,7 @@ export default function Video() {
                     <Videos video={video} horizontal={true} />
                   </Link>
                 ))}
-              </div>
+              </div> */}
             </div>
         )}
       </div>

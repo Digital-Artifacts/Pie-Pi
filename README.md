@@ -6,3 +6,5 @@ To use Pie-Pi now, you can upload videos from your local computer or smartphone 
 
 ## Description
 We are building Pie-Pi on the Areon Blockchain which uses the Proof of Area of consensus mechanism for achieving high transaction throughput when you upload your videos to the VideoPie contract. Our videos are hosted on IPFS via Livepeer's decentralized hosting service and we use it via the Ethers Library to render the videos you watch on our platform!. Our UI is written in Typescript and powered by NextJs!
+
+If you can tell, we are pretty excited about this project, and you should be too!

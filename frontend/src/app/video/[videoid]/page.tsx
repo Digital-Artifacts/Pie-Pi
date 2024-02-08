@@ -142,9 +142,14 @@ export default function Video() {
               </div>
               </div>
 
-              <p className="text-text-light dark:text-text-dark-text-textSubtTitle mt-4 ml-16 text-sm">
-                  {video.description}
-                </p>
+              <div className="border-border-light dark:border-border-dark flex flex-row justify-between border b-2 py-4">
+                  <div className="">
+                  <h3 className="text-text-light dark:text-text-dark-text-textSubtTitle mt-4 ml-16 text-base">
+                  {"Description: " + video.description}
+                  </h3>
+                  </div>
+              </div>
+             
 
               <div>
                 <div className="mt-5 flex flex-row items-center">

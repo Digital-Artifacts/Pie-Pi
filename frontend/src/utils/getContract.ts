@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 export default async function getContract() {
     // Creating a new provider
     const provider = new ethers.BrowserProvider(window.ethereum);
-    const contractAddress = "0x2FEAC948ea06381c0026A7840856f391901f16C8";
+    const contractAddress = "0x7aBE028aaB3980f3a9535Ee4Df9377849b76987D";
 
     try {
         // Getting the signer

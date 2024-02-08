@@ -221,7 +221,7 @@ async function uploadVideo(): Promise<UploadVideoParams | null> {
     );
 
     // Log a message indicating that the video was uploaded
-    console.log("Your video:", data.title,",", "has been uploaded to the contract!");
+    console.log("Your video:", data.title,",", "has been uploaded to the areon blockchain!");
   };
 
 

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 export default function Component() {
   return (
     <header className="dark flex h-20 w-full shrink-0 items-center px-4 md:px-6 bg-transparent text-gray-200">
-      <Link className="mr-6" href="#">
+      <Link className="mr-6" href="./">
         <VideoIcon className="h-6 w-6" />
         <span className="sr-only">Pie-Pi</span>
       </Link>

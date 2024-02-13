@@ -1,8 +1,11 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import Link from 'next/link';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount } from 'wagmi';
 
-const Landing = () => {
+const LandingPage = () => {
 
     const [isConnected, setIsConnected] = useState(false);
     
@@ -62,11 +65,20 @@ const Landing = () => {
             
             <h1 className="text-5xl text-white md:text-6xl font-extrabold leading-tighter tracking-tighter mb-4" 
                 data-aos="zoom-y-0ut"
-            >   
-            It's Youtube, but {" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
-            Decentralized</span>
+            >
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-teal-400">Pie - {" "}</span>   
+            
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-teal-400">
+            Pi</span>
             </h1>
+            
+            <h2 className="text-5xl text-white md:text-6xl font-extrabold leading-tighter tracking-tighter mb-4" 
+                data-aos="zoom-y-0ut"
+            >   
+            
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-red-400">
+            A video sharing network coming to Avalanche!.!</span>
+            </h2>
         <div className='max-w-3xl mx-auto'>
 
             <p
@@ -74,19 +86,44 @@ const Landing = () => {
                 data-aos="zoom-y-out"
                 data-aos-delay="150"
             >
-            A Youtube CLone built on top of Polygon network, allows users to create, share and watch videos, without worrying about their privacy.
+            Create! Share! and Watch Videos! on the blockchain!! 
             </p>
 
-            <button 
+            {/* <button
+                  className="items-center  bg-white rounded-full font-medium  p-4 shadow-lg"
+                  onClick={() => {
+                    // Calling the connectWallet function when user clicks on the button
+                    connectWallet();
+                  }}
+                >
+                  <span className='text-black'>Connect Wallet</span>
+                </button> */}
+
+            
+            
+            <button className='items-center  bg-white rounded-full font-medium hover:bg-red-500 p-4 shadow-lg mr-6'>
+                <Link className="text-base font-medium hover:underline text-black text-" href="./home">
+                    Watch Videos
+                </Link>
+            </button>
+
+            <button className='items-center  bg-white rounded-full hover:bg-sky-500 font-medium  p-4 shadow-lg ml-6'>
+                <Link className="text-base font-medium hover:underline text-black" href="./upload">
+                    Upload Videos
+                </Link>
+            </button>
+            
+
+            {/* <button 
                 className={`items-center bg-white rounded-full font-medium p-4 shadow-lg
                     ${ isConnected ? "bg-gray-500 text-white" : ""}`}               
                 onClick={() => {
                     // Calling the connectWallet function when the button is clicked
                     connectWallet();
                 } }
-            >
-            <span>{ isConnected ? "Wallet Connected" : "Connect wallet" }</span>
-            </button>
+            >Connect WAllet
+            <span className='text-white' { isConnected ? "Wallet Connected" : "Connect wallet" }</span>
+            </button> */}
         </div>
         </div>
         </div>
@@ -99,4 +136,4 @@ const Landing = () => {
   )
 }
 
-export default Landing
+export default LandingPage

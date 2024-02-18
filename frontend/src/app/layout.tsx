@@ -13,6 +13,11 @@ import {
 import { WalletEntryPosition } from '@particle-network/auth';
 import '@particle-network/connect-react-ui/esm/index.css';
 import { evmWallets } from '@particle-network/connect';
+import { ApolloProvider } from "@apollo/client";
+import { LivepeerConfig } from "@livepeer/react";
+
+import LivepeerClient from '@/clients/livepeer';
+import ApolloClient from '@/clients/apollo'; 
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -53,10 +58,16 @@ export default function RootLayout({
   return (
     <html lang="en">
     <body>
+    
+    
     <ModalProvider particleAuthSort={particleAuthSort} options={options} walletSort={walletSort}>
+    <LivepeerConfig client={LivepeerClient}>
+    <ApolloProvider client={ApolloClient}> 
       <main>{children}</main>
+    </ApolloProvider>
+    </LivepeerConfig>
     </ModalProvider>
-   
+    
     </body>
   </html>
   )

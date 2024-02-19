@@ -19,6 +19,7 @@ import { LivepeerConfig } from "@livepeer/react";
 import LivepeerClient from '@/clients/livepeer';
 import ApolloClient from '@/clients/apollo'; 
 
+
 const inter = Inter({ subsets: ['latin'] })
 
 // export const metadata: Metadata = {
@@ -28,9 +29,9 @@ const inter = Inter({ subsets: ['latin'] })
 
 
 const options = {
-  projectId: '',
-  clientKey: '',
-  appId: '',
+  projectId: 'a148efd9-c501-4e74-a09b-3d3df1e52c23',
+  clientKey: 'cfWucVhHId17CfNma5bPZquCYih342jcFNDAY76m',
+  appId: '527375f3-46fb-469e-bb98-828126e23873',
   chains: [AvalancheTestnet, PolygonMumbai, EthereumSepolia, EthereumHolesky, ArbitrumSepolia],
 
   particleWalletEntry: {
@@ -39,7 +40,7 @@ const options = {
     supportChains:[AvalancheTestnet, PolygonMumbai, EthereumSepolia, EthereumHolesky, ArbitrumSepolia],
   },
   wallets: evmWallets({ 
-    projectId: '', //replace with walletconnect projectId
+    projectId: 'bcfa9e3c9133f44179fcf54cfea2ad88', //replace with walletconnect projectId
     showQrModal: false
  }),
 

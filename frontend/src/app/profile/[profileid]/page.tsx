@@ -1,9 +1,79 @@
+'use client'
+
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card"
 import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+import '@particle-network/connect-react-ui/dist/index.css';
+import { useConnectKit } from "@particle-network/connect-react-ui";
+import { ConnectButton } from '@particle-network/connect-react-ui';
+import { useAccount } from '@particle-network/connect-react-ui';
+import axios from "axios";
+import React, {useEffect, useState} from 'react';
+
+import { useParams } from "next/navigation";
+
+
+export type Profile = {
+  id: string;
+}
 
 export default function Component() {
+
+
+  const params = useParams();
+  const profileid = params.profileid;
+  console.log(profileid);
+
+  const axios = require('axios');
+
+  async function getTokenAmount() {
+    const address = '0xAADa3A46D4A94593CaB32484279B86A4AfD149B0';
+    const tokenAddresses = [
+        '0x44d52D9F508F6F6378b9e9bbC74cEB4f394CbC32',
+        '0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846'
+    ];
+
+    const response = await axios.post('https://rpc.particle.network/evm-chain', {
+        chainId: 43113,
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'particle_getTokensAndNFTs',
+        params: [address, tokenAddresses],
+    }, {
+        auth: {
+            username: 'a148efd9-c501-4e74-a09b-3d3df1e52c23',
+            password: 'sSj4Kb9T7kxJHSJapZ332k1TCDaHpcpiZrsfNC7B',
+        }
+    });
+
+    return response.data.result.tokens[0].amount;
+  }
+
+  
+
+ // Fetch token amount and update tokenAmount variable
+ useEffect(() => {
+  getTokenAmount().then(amount => {
+    setTokenAmount(amount);
+  });
+}, []);
+
+const [tokenAmount, setTokenAmount] = useState(null);
+console.log(tokenAmount);
+
+    //use this in react component.
+    const account = useAccount();
+      if (account) {
+      // connect wallet success
+      console.log(account)
+    }
+    console.log(account)
+
+   
   return (
+    <ConnectButton.Custom>
+    {({ account, chain, openAccountModal, openConnectModal, openChainModal, accountLoading }) => {
+      return ( 
     <div key="1" className="flex flex-col  min-h-screen w-full overflow-hidden dark:bg-gray-800">
 
 <section className="w-full h-[250px] bg-[#f5f5f5] flex items-center justify-center">
@@ -30,13 +100,14 @@ export default function Component() {
             <CardHeader>
               <CardTitle>Wallet Address</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm">0x3Dc6...DxE9e</CardContent>
+            <CardContent className="text-sm">{profileid}</CardContent>
+            
           </Card>
           <Card className="bg-gray-700 text-white">
             <CardHeader>
               <CardTitle>Tokens Earned</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm">1,234.56 ETH</CardContent>
+            <CardContent className="text-sm">{tokenAmount && `${tokenAmount} PT`}</CardContent>
           </Card>
           <Card className="bg-gray-700 text-white">
             <CardHeader>
@@ -122,5 +193,8 @@ export default function Component() {
         </div>
       </main>
     </div>
+      )
+        }}
+    </ConnectButton.Custom>
   )
 }

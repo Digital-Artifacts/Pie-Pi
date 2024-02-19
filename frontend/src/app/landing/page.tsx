@@ -2,12 +2,14 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 import '@particle-network/connect-react-ui/dist/index.css';
 import { ConnectButton } from '@particle-network/connect-react-ui';
 
+
 const LandingPage = () => {
-    
+    const params = useParams<{slug:string}>
 
   return (
     <>
@@ -32,7 +34,7 @@ const LandingPage = () => {
             >   
             
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-red-400">
-            A video sharing network coming to Areon..</span>
+            A video sharing network coming to Avalanche..</span>
             </h2>
         <div className='max-w-3xl mx-auto'>
 
@@ -67,24 +69,25 @@ const LandingPage = () => {
                 return (
                     <div>
                         <button onClick={openConnectModal} disabled={!!account} className='items-center  bg-white rounded-full font-medium hover:bg-red-500 p-4 shadow-lg mr-6'>
-                        <Link className="text-base font-medium hover:underline text-black" href="./profile">
+                        
+                        <Link className="text-base font-medium hover:underline text-black" href={`/profile/${account}`}>
                             Open Connect
                         </Link>
                         </button>
                         <br />
-                        <br />
+                        
                         <button onClick={openAccountModal} disabled={!account}>
-                            Open Account
+                            Logout
                         </button>
                         <br />
                         <br />
-                        <button onClick={openChainModal} disabled={!account}>
+                        {/* <button onClick={openChainModal} disabled={!account}>
                             Open Switch Network
                         </button>
                         <div>
                             <h3>account</h3>
                             <p>{account}</p>
-                        </div>
+                        </div> */}
                     </div>
                 );
             }}
